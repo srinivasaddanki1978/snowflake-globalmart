@@ -1,0 +1,19 @@
+version: 2
+
+sources:
+  - name: raw
+    database: GLOBALMART
+    schema: RAW
+    tables:
+      - name: RAW_CUSTOMERS_LOAD
+        description: "VARIANT landing table for 6 regional customer CSV files"
+      - name: RAW_ORDERS_LOAD
+        description: "VARIANT landing table for 3 regional order CSV files"
+      - name: RAW_TRANSACTIONS_LOAD
+        description: "VARIANT landing table for 3 transaction CSV files (regions + root)"
+      - name: RAW_RETURNS_LOAD
+        description: "VARIANT landing table for 2 return JSON files (Region6 + root)"
+      - name: RAW_PRODUCTS_LOAD
+        description: "VARIANT landing table for product catalog JSON"
+      - name: RAW_VENDORS_LOAD
+        description: "VARIANT landing table for vendor reference CSV"

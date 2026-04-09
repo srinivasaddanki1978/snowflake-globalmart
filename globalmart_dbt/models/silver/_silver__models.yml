@@ -1,0 +1,184 @@
+version: 2
+
+models:
+  - name: _customers_harmonized
+    description: "Ephemeral: harmonizes customer data with COALESCE, segment mapping, city/state swap, region mapping. Computes _fail_* flags."
+    config:
+      materialized: ephemeral
+
+  - name: _orders_harmonized
+    description: "Ephemeral: harmonizes order data with ship mode mapping, status normalization, multi-format date parsing."
+    config:
+      materialized: ephemeral
+
+  - name: _transactions_harmonized
+    description: "Ephemeral: harmonizes transaction data with COALESCE ID pairs, currency stripping, percentage discount conversion."
+    config:
+      materialized: ephemeral
+
+  - name: _returns_harmonized
+    description: "Ephemeral: harmonizes return data with COALESCE all 5 column pairs, status mapping, '?' handling."
+    config:
+      materialized: ephemeral
+
+  - name: _products_harmonized
+    description: "Ephemeral: harmonizes product data with TRIM, UPC scientific notation fix."
+    config:
+      materialized: ephemeral
+
+  - name: _vendors_harmonized
+    description: "Ephemeral: harmonizes vendor data with TRIM and NULL/empty checks."
+    config:
+      materialized: ephemeral
+
+  - name: clean_customers
+    description: "Silver customers — passed all 4 quality rules (customer_id, customer_name, segment, region)."
+    columns:
+      - name: customer_id
+        description: "Unified customer identifier after COALESCE"
+        tests:
+          - not_null  # Rule 1
+      - name: customer_name
+        description: "Customer full name"
+        tests:
+          - not_null  # Rule 2
+      - name: segment
+        description: "Customer segment: Consumer, Corporate, Home Office"
+        tests:
+          - not_null
+          - accepted_values:  # Rule 3
+              values: ['Consumer', 'Corporate', 'Home Office']
+      - name: region
+        description: "Geographic region"
+        tests:
+          - not_null
+          - accepted_values:  # Rule 4
+              values: ['East', 'West', 'South', 'Central', 'North']
+
+  - name: clean_orders
+    description: "Silver orders — passed all 5 quality rules."
+    columns:
+      - name: order_id
+        description: "Order identifier"
+        tests:
+          - not_null  # Rule 5
+      - name: customer_id
+        description: "Customer FK"
+        tests:
+          - not_null  # Rule 6
+      - name: ship_mode
+        description: "Shipping method"
+        tests:
+          - not_null
+          - accepted_values:  # Rule 7
+              values: ['First Class', 'Second Class', 'Standard Class', 'Same Day']
+      - name: order_status
+        description: "Order status (lowercase)"
+        tests:
+          - not_null
+          - accepted_values:  # Rule 8
+              values: ['canceled', 'created', 'delivered', 'invoiced', 'processing', 'shipped', 'unavailable']
+      - name: order_purchase_date
+        description: "Parsed purchase timestamp"
+        tests:
+          - not_null  # Rule 9 (all unparseable dates rejected)
+
+  - name: clean_transactions
+    description: "Silver transactions — passed all 5 quality rules."
+    columns:
+      - name: order_id
+        description: "Order identifier after COALESCE"
+        tests:
+          - not_null  # Rule 10
+      - name: product_id
+        description: "Product identifier after COALESCE"
+        tests:
+          - not_null  # Rule 11
+      - name: sales
+        description: "Sale amount (currency stripped)"
+        tests:
+          - not_null
+          - in_range:  # Rule 12
+              min_value: 0
+      - name: quantity
+        description: "Quantity sold"
+        tests:
+          - not_null
+          - in_range:  # Rule 13
+              min_value: 1
+              inclusive: true
+      - name: discount
+        description: "Discount rate (0-1 range)"
+        tests:
+          - not_null
+          - in_range:  # Rule 14
+              min_value: 0
+              max_value: 1
+
+  - name: clean_returns
+    description: "Silver returns — passed all 5 quality rules."
+    columns:
+      - name: order_id
+        description: "Order identifier after COALESCE"
+        tests:
+          - not_null  # Rule 15
+      - name: refund_amount
+        description: "Refund amount (non-negative)"
+        tests:
+          - in_range:  # Rule 16
+              min_value: 0
+      - name: return_status
+        description: "Return status: Approved, Pending, Rejected"
+        tests:
+          - not_null
+          - accepted_values:  # Rule 17
+              values: ['Approved', 'Pending', 'Rejected']
+      - name: return_reason
+        description: "Reason for return (not Unknown)"
+        tests:
+          - not_null  # Rule 18
+      - name: return_date
+        description: "Parsed return date"
+        tests:
+          - not_null  # Rule 19
+
+  - name: clean_products
+    description: "Silver products — passed 2 quality rules."
+    columns:
+      - name: product_id
+        description: "Product identifier"
+        tests:
+          - not_null  # Rule 20
+      - name: product_name
+        description: "Product display name"
+        tests:
+          - not_null  # Rule 21
+
+  - name: clean_vendors
+    description: "Silver vendors — passed 2 quality rules."
+    columns:
+      - name: vendor_id
+        description: "Vendor identifier"
+        tests:
+          - not_null  # Rule 22
+      - name: vendor_name
+        description: "Vendor company name"
+        tests:
+          - not_null  # Rule 23
+
+  - name: rejected_records
+    description: "Quarantine table — one row per failure per record. 23 UNION ALL blocks covering all quality rules."
+    columns:
+      - name: source_table
+        description: "Origin clean table (e.g., clean_customers)"
+      - name: record_key
+        description: "Business key value of rejected record"
+      - name: affected_field
+        description: "Column that failed validation"
+      - name: issue_type
+        description: "missing_value | invalid_value | out_of_range | parse_failure"
+
+  - name: pipeline_audit_log
+    description: "View reconciling bronze_count = silver_count + rejected_count per entity."
+    config:
+      materialized: view

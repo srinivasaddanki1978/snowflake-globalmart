@@ -1,0 +1,20 @@
+version: 2
+
+models:
+  - name: mv_monthly_revenue_by_region
+    description: "Metrics view: revenue by year x month x region. Supports Revenue Audit use case."
+
+  - name: mv_segment_profitability
+    description: "Metrics view: profitability by customer segment x region. Supports Revenue Audit use case."
+
+  - name: mv_customer_return_history
+    description: "Metrics view: per-customer return profile. Supports Returns Fraud detection."
+
+  - name: mv_return_reason_analysis
+    description: "Metrics view: return reasons by region. Supports Returns Fraud analysis."
+
+  - name: mv_vendor_product_performance
+    description: "Metrics view: vendor x product x region performance. Supports Inventory Blindspot."
+
+  - name: mv_product_return_impact
+    description: "Metrics view: product return cost by region. Supports Inventory Blindspot."

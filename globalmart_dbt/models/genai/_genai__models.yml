@@ -1,0 +1,42 @@
+version: 2
+
+models:
+  - name: dq_audit_report
+    description: "UC1: Data Quality Reporter. Groups rejected records, computes rejection rates, generates AI explanation per group via CORTEX.COMPLETE."
+    columns:
+      - name: entity
+        description: "Entity name (customers, orders, etc.)"
+      - name: affected_field
+        description: "Field with quality issue"
+      - name: ai_explanation
+        description: "LLM-generated business-friendly explanation"
+
+  - name: flagged_return_customers
+    description: "UC2: Returns Fraud Investigator. 5 weighted anomaly rules, flags score >= 40, AI investigation brief."
+    columns:
+      - name: customer_id
+        description: "Flagged customer ID"
+      - name: anomaly_score
+        description: "Composite score 0-100"
+      - name: investigation_brief
+        description: "LLM-generated investigation narrative"
+
+  - name: rag_query_history
+    description: "UC3: Product Intelligence RAG. Snowpark Python model that builds RAG docs, queries Cortex Search, answers 5 test questions."
+    columns:
+      - name: question
+        description: "Test question"
+      - name: answer
+        description: "LLM answer grounded in retrieved documents"
+      - name: retrieved_count
+        description: "Number of docs retrieved"
+
+  - name: ai_business_insights
+    description: "UC4: Executive Business Intelligence. 3 domain narratives from summary KPIs via CORTEX.COMPLETE."
+    columns:
+      - name: insight_type
+        description: "revenue_performance, vendor_return_rate, or slow_moving_inventory"
+      - name: executive_summary
+        description: "LLM-generated executive narrative"
+      - name: kpi_data
+        description: "JSON of KPI inputs"

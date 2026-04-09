@@ -1,0 +1,28 @@
+name: 'globalmart_dbt'
+version: '1.0.0'
+config-version: 2
+profile: 'globalmart'
+
+model-paths: ["models"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+models:
+  globalmart_dbt:
+    bronze:
+      +schema: BRONZE
+      +materialized: incremental
+      +incremental_strategy: append
+    silver:
+      +schema: SILVER
+      +materialized: incremental
+      +incremental_strategy: append
+    gold:
+      +schema: GOLD
+      +materialized: table
+    metrics:
+      +schema: METRICS
+      +materialized: view
+    genai:
+      +schema: GOLD
+      +materialized: table

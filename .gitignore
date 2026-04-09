@@ -1,0 +1,23 @@
+# Secrets - NEVER commit
+Connect-token-secret.txt
+*.secret
+*.key
+*.pem
+
+# Python
+__pycache__/
+*.pyc
+.env
+
+# dbt
+globalmart_dbt/target/
+globalmart_dbt/dbt_packages/
+globalmart_dbt/logs/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

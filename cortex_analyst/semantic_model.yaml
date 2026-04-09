@@ -1,0 +1,171 @@
+name: GlobalMart Data Intelligence
+description: >
+  Semantic model for GlobalMart, a 5-region US retail chain.
+  Solves 3 business failures: Revenue Audit (9% overstatement),
+  Returns Fraud ($2.3M annual loss), Inventory Blindspot (12-18% revenue lost).
+
+tables:
+  - name: dim_customers
+    database: GLOBALMART
+    schema: GOLD
+    description: "374 unique customers (deduped from 748 raw). Segments: Consumer, Corporate, Home Office."
+    columns:
+      - name: customer_sk
+        description: Surrogate key for joins
+      - name: customer_id
+        description: Business key
+      - name: customer_name
+        description: Full name
+      - name: customer_email
+        description: Email address
+      - name: segment
+        description: "Consumer, Corporate, or Home Office"
+      - name: city
+        description: Customer city
+      - name: state
+        description: Customer state
+      - name: region
+        description: "East, West, South, Central, or North"
+
+  - name: dim_products
+    database: GLOBALMART
+    schema: GOLD
+    description: Product catalog with brand and category
+    columns:
+      - name: product_sk
+        description: Surrogate key
+      - name: product_id
+        description: Business key
+      - name: product_name
+        description: Display name
+      - name: brand
+        description: Product brand
+      - name: category
+        description: Product category
+      - name: upc
+        description: Universal product code
+
+  - name: dim_vendors
+    database: GLOBALMART
+    schema: GOLD
+    description: Vendor reference
+    columns:
+      - name: vendor_sk
+        description: Surrogate key
+      - name: vendor_id
+        description: Business key
+      - name: vendor_name
+        description: Vendor company name
+
+  - name: dim_dates
+    database: GLOBALMART
+    schema: GOLD
+    description: "Calendar dimension covering order and return date ranges"
+    columns:
+      - name: date_sk
+        description: Surrogate key
+      - name: date_key
+        description: Calendar date
+      - name: year
+        description: Year number
+      - name: quarter
+        description: Quarter number
+      - name: month
+        description: Month number
+      - name: month_name
+        description: Month name
+      - name: day
+        description: Day of month
+      - name: day_of_week
+        description: Day of week number
+      - name: is_weekend
+        description: Weekend flag
+
+  - name: fact_sales
+    database: GLOBALMART
+    schema: GOLD
+    description: "One row per order line item. Measures: sales, quantity, discount, profit."
+    columns:
+      - name: order_id
+        description: Order identifier
+      - name: customer_sk
+        description: FK to dim_customers
+      - name: customer_id
+        description: Customer business key
+      - name: product_sk
+        description: FK to dim_products
+      - name: product_id
+        description: Product business key
+      - name: vendor_sk
+        description: FK to dim_vendors
+      - name: vendor_id
+        description: Vendor business key
+      - name: order_date_sk
+        description: FK to dim_dates
+      - name: sales
+        description: Revenue amount
+      - name: quantity
+        description: Units sold
+      - name: discount
+        description: Discount rate (0 to 1)
+      - name: profit
+        description: Profit amount
+      - name: ship_mode
+        description: "First Class, Second Class, Standard Class, Same Day"
+      - name: order_status
+        description: Order status
+      - name: payment_type
+        description: Payment method
+
+  - name: fact_returns
+    database: GLOBALMART
+    schema: GOLD
+    description: "One row per return event. Measures: refund_amount."
+    columns:
+      - name: order_id
+        description: Order identifier
+      - name: customer_sk
+        description: FK to dim_customers
+      - name: return_date_sk
+        description: FK to dim_dates
+      - name: refund_amount
+        description: Refund dollars
+      - name: return_reason
+        description: Reason for return
+      - name: return_status
+        description: "Approved, Pending, or Rejected"
+      - name: vendor_id
+        description: Vendor business key
+
+joins:
+  - left_table: fact_sales
+    right_table: dim_customers
+    condition: "customer_sk = customer_sk"
+    type: many_to_one
+  - left_table: fact_sales
+    right_table: dim_products
+    condition: "product_sk = product_sk"
+    type: many_to_one
+  - left_table: fact_sales
+    right_table: dim_vendors
+    condition: "vendor_sk = vendor_sk"
+    type: many_to_one
+  - left_table: fact_sales
+    right_table: dim_dates
+    condition: "order_date_sk = date_sk"
+    type: many_to_one
+  - left_table: fact_returns
+    right_table: dim_customers
+    condition: "customer_sk = customer_sk"
+    type: many_to_one
+  - left_table: fact_returns
+    right_table: dim_dates
+    condition: "return_date_sk = date_sk"
+    type: many_to_one
+
+sample_questions:
+  - "What is the total revenue by region?"
+  - "Which vendors have the highest return rate?"
+  - "Show me the top 5 products by revenue in the West region"
+  - "Which customers have the highest return refunds?"
+  - "What is the profit margin by segment?"
