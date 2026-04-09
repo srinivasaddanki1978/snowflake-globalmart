@@ -1,18 +1,10 @@
 {{ config(materialized='table') }}
 
-WITH ranked AS (
-    SELECT
-        *,
-        ROW_NUMBER() OVER (
-            PARTITION BY vendor_id
-            ORDER BY _load_timestamp DESC
-        ) AS row_num
-    FROM {{ ref('clean_vendors') }}
-)
-
+-- GROUP BY vendor_id guarantees one row per vendor
 SELECT
     {{ dbt_utils.generate_surrogate_key(['vendor_id']) }} AS vendor_sk,
     vendor_id,
-    vendor_name
-FROM ranked
-WHERE row_num = 1
+    MAX(vendor_name) AS vendor_name
+FROM {{ ref('clean_vendors') }}
+WHERE vendor_id IS NOT NULL
+GROUP BY vendor_id
