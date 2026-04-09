@@ -10,9 +10,9 @@ __pycache__/
 .env
 
 # dbt
-globalmart_dbt/target/
-globalmart_dbt/dbt_packages/
-globalmart_dbt/logs/
+target/
+dbt_packages/
+logs/
 
 # IDE
 .vscode/
