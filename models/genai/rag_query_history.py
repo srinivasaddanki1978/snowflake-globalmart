@@ -111,6 +111,7 @@ def model(dbt, session: snowpark.Session):
                 retrieved_count = 0
 
             # Call CORTEX.COMPLETE with retrieved context
+            cortex_opts = "{'temperature': 0.3, 'max_tokens': 512}"
             answer_result = session.sql(f"""
                 SELECT SNOWFLAKE.CORTEX.COMPLETE(
                     'llama3.1-70b',
@@ -118,7 +119,7 @@ def model(dbt, session: snowpark.Session):
                     || 'If the information is not in the documents, say so. '
                     || 'Question: {question.replace("'", "''")} '
                     || 'Documents: {retrieved_docs[:3000].replace("'", "''")}',
-                    {{'temperature': 0.3, 'max_tokens': 512}}
+                    {cortex_opts}
                 ) AS answer
             """).collect()
 
