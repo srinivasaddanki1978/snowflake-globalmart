@@ -4,6 +4,9 @@ Connect-token-secret.txt
 *.key
 *.pem
 
+# Local-only project instructions for Claude Code
+CLAUDE.md
+
 # Python
 __pycache__/
 *.pyc
