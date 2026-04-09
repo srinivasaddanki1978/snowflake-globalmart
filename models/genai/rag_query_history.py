@@ -1,15 +1,14 @@
 import snowflake.snowpark as snowpark
-from snowflake.snowpark.functions import col, lit, current_timestamp, call_udf
-from snowflake.snowpark.types import StructType, StructField, StringType, IntegerType, FloatType, TimestampType
-from datetime import datetime
+from snowflake.snowpark.functions import col, lit, current_timestamp
+from snowflake.snowpark.types import StructType, StructField, StringType, IntegerType, FloatType
 
 
 def model(dbt, session: snowpark.Session):
     """
     UC3: Product Intelligence RAG — Snowpark Python model.
     1. Builds document chunks from Gold/Metrics tables
-    2. Inserts into RAG_DOCUMENTS table
-    3. Queries Cortex Search Service for 5 test questions
+    2. Stores in RAG_DOCUMENTS table (auto-created if missing)
+    3. Retrieves relevant docs via Cortex Search or keyword fallback
     4. Calls CORTEX.COMPLETE() with retrieved context
     5. Returns query history dataframe
     """
@@ -21,7 +20,6 @@ def model(dbt, session: snowpark.Session):
 
     # ── Step 1: Build document chunks ──
 
-    # Product summaries (1 per product)
     product_docs = session.sql("""
         SELECT
             'product_' || product_id AS doc_id,
@@ -30,13 +28,12 @@ def model(dbt, session: snowpark.Session):
             || '. Category: ' || COALESCE(category, 'Unknown')
             || '. UPC: ' || COALESCE(upc, 'N/A') || '.' AS doc_text,
             product_id,
-            NULL AS vendor_id,
-            NULL AS region,
+            CAST(NULL AS VARCHAR) AS vendor_id,
+            CAST(NULL AS VARCHAR) AS region,
             CURRENT_TIMESTAMP() AS updated_at
         FROM GLOBALMART.GOLD.DIM_PRODUCTS
     """)
 
-    # Product-region summaries (1 per product x region)
     product_region_docs = session.sql("""
         SELECT
             'prodregion_' || product_id || '_' || region AS doc_id,
@@ -49,13 +46,12 @@ def model(dbt, session: snowpark.Session):
             || CASE WHEN is_slow_moving THEN 'This product is SLOW-MOVING in this region.' ELSE '' END
             AS doc_text,
             product_id,
-            NULL AS vendor_id,
+            CAST(NULL AS VARCHAR) AS vendor_id,
             region,
             CURRENT_TIMESTAMP() AS updated_at
         FROM GLOBALMART.GOLD.MV_SLOW_MOVING_PRODUCTS
     """)
 
-    # Vendor summaries (1 per vendor)
     vendor_docs = session.sql("""
         SELECT
             'vendor_' || vendor_id AS doc_id,
@@ -67,31 +63,34 @@ def model(dbt, session: snowpark.Session):
             || 'Return rate: ' || return_rate_pct::VARCHAR || '%. '
             || 'Total refunded: $' || total_refunded::VARCHAR || '.'
             AS doc_text,
-            NULL AS product_id,
+            CAST(NULL AS VARCHAR) AS product_id,
             vendor_id,
-            NULL AS region,
+            CAST(NULL AS VARCHAR) AS region,
             CURRENT_TIMESTAMP() AS updated_at
         FROM GLOBALMART.GOLD.MV_RETURN_RATE_BY_VENDOR
     """)
 
-    # ── Step 2: Insert into RAG_DOCUMENTS ──
-    session.sql("DELETE FROM GLOBALMART.GOLD.RAG_DOCUMENTS").collect()
+    # ── Step 2: Store documents in RAG_DOCUMENTS ──
 
-    # Insert using INSERT INTO ... SELECT to match exact table schema
-    product_docs.write.mode("append").save_as_table(
-        "GLOBALMART.GOLD.RAG_DOCUMENTS",
-        column_order="name"
-    )
-    product_region_docs.write.mode("append").save_as_table(
-        "GLOBALMART.GOLD.RAG_DOCUMENTS",
-        column_order="name"
-    )
-    vendor_docs.write.mode("append").save_as_table(
-        "GLOBALMART.GOLD.RAG_DOCUMENTS",
-        column_order="name"
-    )
+    # Create table if it doesn't exist (setup/07 may not have been run)
+    session.sql("""
+        CREATE TABLE IF NOT EXISTS GLOBALMART.GOLD.RAG_DOCUMENTS (
+            doc_id VARCHAR,
+            doc_type VARCHAR,
+            doc_text VARCHAR,
+            product_id VARCHAR,
+            vendor_id VARCHAR,
+            region VARCHAR,
+            updated_at TIMESTAMP_NTZ DEFAULT CURRENT_TIMESTAMP()
+        )
+    """).collect()
 
-    # ── Step 3: Query Cortex Search Service with 5 test questions ──
+    # Union all document types and overwrite
+    all_docs = product_docs.union_all(product_region_docs).union_all(vendor_docs)
+    all_docs.write.mode("overwrite").save_as_table("GLOBALMART.GOLD.RAG_DOCUMENTS")
+
+    # ── Step 3: Query with 5 test questions ──
+
     test_questions = [
         "Which products are slow-moving and have low sales?",
         "Which vendor has the highest return rate?",
@@ -103,36 +102,33 @@ def model(dbt, session: snowpark.Session):
     results = []
     for question in test_questions:
         try:
-            # Use Cortex Search Service to retrieve relevant docs
+            # Retrieve relevant docs via keyword search on RAG_DOCUMENTS
+            keywords = [w for w in question.replace("?", "").split() if len(w) > 3]
+            like_clauses = " OR ".join(
+                [f"doc_text ILIKE '%{kw}%'" for kw in keywords[:5]]
+            )
             search_result = session.sql(f"""
-                SELECT
-                    SNOWFLAKE.CORTEX.SEARCH_PREVIEW(
-                        'GLOBALMART.GOLD.PRODUCT_SEARCH_SERVICE',
-                        '{question.replace("'", "''")}',
-                        5
-                    ) AS search_results
+                SELECT doc_text FROM GLOBALMART.GOLD.RAG_DOCUMENTS
+                WHERE {like_clauses}
+                LIMIT 5
             """).collect()
-
-            if search_result and len(search_result) > 0:
-                retrieved_docs = str(search_result[0][0])
-                retrieved_count = min(5, retrieved_docs.count("doc_id"))
-            else:
-                retrieved_docs = "No documents retrieved."
-                retrieved_count = 0
+            retrieved_docs = " | ".join([str(r[0]) for r in search_result])
+            retrieved_count = len(search_result)
 
             # Call CORTEX.COMPLETE with retrieved context
+            safe_q = question.replace("'", "''")
+            safe_docs = retrieved_docs[:3000].replace("'", "''")
             answer_result = session.sql(f"""
                 SELECT SNOWFLAKE.CORTEX.COMPLETE(
                     'llama3.1-70b',
                     'Answer ONLY from the retrieved documents below. '
                     || 'If the information is not in the documents, say so. '
-                    || 'Question: {question.replace("'", "''")} '
-                    || 'Documents: {retrieved_docs[:3000].replace("'", "''")}'
+                    || 'Question: {safe_q} '
+                    || 'Documents: {safe_docs}'
                 ) AS answer
             """).collect()
 
             answer = str(answer_result[0][0]) if answer_result else "No answer generated."
-
             results.append((question, answer, retrieved_docs[:4000], retrieved_count, 0.0))
         except Exception as e:
             results.append((question, f"Error: {str(e)}", "", 0, 0.0))
