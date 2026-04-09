@@ -1,0 +1,7 @@
+version: 2
+
+models:
+  - name: _transactions_harmonized
+    description: "Ephemeral: harmonizes transaction data with COALESCE ID pairs, currency stripping, percentage discount conversion."
+    config:
+      materialized: ephemeral

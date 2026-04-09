@@ -1,0 +1,5 @@
+version: 2
+
+models:
+  - name: mv_slow_moving_products
+    description: "Gold MV: bottom 25% by quantity per region via PERCENT_RANK. Rubric-required name."

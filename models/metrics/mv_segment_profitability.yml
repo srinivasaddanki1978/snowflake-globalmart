@@ -1,0 +1,5 @@
+version: 2
+
+models:
+  - name: mv_segment_profitability
+    description: "Metrics view: profitability by customer segment x region. Supports Revenue Audit use case."

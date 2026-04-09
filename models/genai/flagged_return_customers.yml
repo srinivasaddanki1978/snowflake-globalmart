@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: flagged_return_customers
+    description: "UC2: Returns Fraud Investigator. 5 weighted anomaly rules, flags score >= 40, AI investigation brief."
+    columns:
+      - name: customer_id
+        description: "Flagged customer ID"
+      - name: anomaly_score
+        description: "Composite score 0-100"
+      - name: investigation_brief
+        description: "LLM-generated investigation narrative"

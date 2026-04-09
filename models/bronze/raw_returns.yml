@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: raw_returns
+    description: "Bronze extraction of return data from VARIANT JSON. Every column name differs between files."
+    columns:
+      - name: order_id_v1
+        description: "order_id from returns_1.json"
+      - name: order_id_v2
+        description: "OrderId from returns_2.json"

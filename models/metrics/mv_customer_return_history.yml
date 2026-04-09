@@ -1,0 +1,5 @@
+version: 2
+
+models:
+  - name: mv_customer_return_history
+    description: "Metrics view: per-customer return profile. Supports Returns Fraud detection."

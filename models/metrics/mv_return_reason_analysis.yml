@@ -1,0 +1,5 @@
+version: 2
+
+models:
+  - name: mv_return_reason_analysis
+    description: "Metrics view: return reasons by region. Supports Returns Fraud analysis."

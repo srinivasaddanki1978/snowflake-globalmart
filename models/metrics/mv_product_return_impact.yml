@@ -1,0 +1,5 @@
+version: 2
+
+models:
+  - name: mv_product_return_impact
+    description: "Metrics view: product return cost by region. Supports Inventory Blindspot."

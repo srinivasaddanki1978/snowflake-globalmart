@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: rejected_records
+    description: "Quarantine table — one row per failure per record. 23 UNION ALL blocks covering all quality rules."
+    columns:
+      - name: source_table
+        description: "Origin clean table (e.g., clean_customers)"
+      - name: record_key
+        description: "Business key value of rejected record"
+      - name: affected_field
+        description: "Column that failed validation"
+      - name: issue_type
+        description: "missing_value | invalid_value | out_of_range | parse_failure"

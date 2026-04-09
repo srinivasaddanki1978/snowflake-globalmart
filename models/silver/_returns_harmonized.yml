@@ -1,0 +1,7 @@
+version: 2
+
+models:
+  - name: _returns_harmonized
+    description: "Ephemeral: harmonizes return data with COALESCE all 5 column pairs, status mapping, '?' handling."
+    config:
+      materialized: ephemeral

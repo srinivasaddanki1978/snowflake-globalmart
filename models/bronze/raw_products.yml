@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: raw_products
+    description: "Bronze extraction of product catalog from VARIANT JSON."
+    columns:
+      - name: product_id
+        description: "Product identifier"
+      - name: upc
+        description: "UPC code (may be in scientific notation)"

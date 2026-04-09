@@ -1,0 +1,7 @@
+version: 2
+
+models:
+  - name: _products_harmonized
+    description: "Ephemeral: harmonizes product data with TRIM, UPC scientific notation fix."
+    config:
+      materialized: ephemeral

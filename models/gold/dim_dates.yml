@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: dim_dates
+    description: "Generated calendar dimension covering full date range of orders and returns."
+    columns:
+      - name: date_sk
+        description: "Surrogate key"
+        tests:
+          - unique
+          - not_null
+      - name: date_key
+        description: "Calendar date"
+        tests:
+          - unique
+          - not_null

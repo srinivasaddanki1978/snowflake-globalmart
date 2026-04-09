@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: raw_transactions
+    description: "Bronze extraction of transaction data from VARIANT. Column casing varies: Order_id vs Order_ID."
+    columns:
+      - name: order_id_v1
+        description: "Order_id casing variant"
+      - name: order_id_v2
+        description: "Order_ID casing variant"

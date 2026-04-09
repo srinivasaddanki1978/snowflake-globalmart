@@ -1,0 +1,7 @@
+version: 2
+
+models:
+  - name: _vendors_harmonized
+    description: "Ephemeral: harmonizes vendor data with TRIM and NULL/empty checks."
+    config:
+      materialized: ephemeral

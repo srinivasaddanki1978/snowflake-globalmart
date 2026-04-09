@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: clean_vendors
+    description: "Silver vendors — passed 2 quality rules."
+    columns:
+      - name: vendor_id
+        description: "Vendor identifier"
+        tests:
+          - not_null
+      - name: vendor_name
+        description: "Vendor company name"
+        tests:
+          - not_null

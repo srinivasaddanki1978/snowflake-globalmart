@@ -1,0 +1,5 @@
+version: 2
+
+models:
+  - name: mv_monthly_revenue_by_region
+    description: "Metrics view: revenue by year x month x region. Supports Revenue Audit use case."

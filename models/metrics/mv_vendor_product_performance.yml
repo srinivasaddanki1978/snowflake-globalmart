@@ -1,0 +1,5 @@
+version: 2
+
+models:
+  - name: mv_vendor_product_performance
+    description: "Metrics view: vendor x product x region performance. Supports Inventory Blindspot."

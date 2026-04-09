@@ -1,0 +1,7 @@
+version: 2
+
+models:
+  - name: _customers_harmonized
+    description: "Ephemeral: harmonizes customer data with COALESCE, segment mapping, city/state swap, region mapping. Computes _fail_* flags."
+    config:
+      materialized: ephemeral

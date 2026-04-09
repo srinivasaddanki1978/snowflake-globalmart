@@ -1,0 +1,34 @@
+version: 2
+
+models:
+  - name: clean_transactions
+    description: "Silver transactions — passed all 5 quality rules."
+    columns:
+      - name: order_id
+        description: "Order identifier after COALESCE"
+        tests:
+          - not_null
+      - name: product_id
+        description: "Product identifier after COALESCE"
+        tests:
+          - not_null
+      - name: sales
+        description: "Sale amount (currency stripped)"
+        tests:
+          - not_null
+          - in_range:
+              min_value: 0
+      - name: quantity
+        description: "Quantity sold"
+        tests:
+          - not_null
+          - in_range:
+              min_value: 1
+              inclusive: true
+      - name: discount
+        description: "Discount rate (0-1 range)"
+        tests:
+          - not_null
+          - in_range:
+              min_value: 0
+              max_value: 1

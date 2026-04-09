@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: ai_business_insights
+    description: "UC4: Executive Business Intelligence. 3 domain narratives from summary KPIs via CORTEX.COMPLETE."
+    columns:
+      - name: insight_type
+        description: "revenue_performance, vendor_return_rate, or slow_moving_inventory"
+      - name: executive_summary
+        description: "LLM-generated executive narrative"
+      - name: kpi_data
+        description: "JSON of KPI inputs"

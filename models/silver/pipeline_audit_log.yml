@@ -1,0 +1,7 @@
+version: 2
+
+models:
+  - name: pipeline_audit_log
+    description: "View reconciling bronze_count = silver_count + rejected_count per entity."
+    config:
+      materialized: view

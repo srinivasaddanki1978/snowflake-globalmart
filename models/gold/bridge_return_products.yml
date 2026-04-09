@@ -1,0 +1,11 @@
+version: 2
+
+models:
+  - name: bridge_return_products
+    description: "Bridge table for proportional refund allocation. Grain: return x product."
+    config:
+      materialized: incremental
+      incremental_strategy: append
+    columns:
+      - name: allocation_weight
+        description: "line_sales / total_order_sales"

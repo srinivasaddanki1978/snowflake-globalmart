@@ -1,0 +1,29 @@
+version: 2
+
+models:
+  - name: clean_returns
+    description: "Silver returns — passed all 5 quality rules."
+    columns:
+      - name: order_id
+        description: "Order identifier after COALESCE"
+        tests:
+          - not_null
+      - name: refund_amount
+        description: "Refund amount (non-negative)"
+        tests:
+          - in_range:
+              min_value: 0
+      - name: return_status
+        description: "Return status: Approved, Pending, Rejected"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Approved', 'Pending', 'Rejected']
+      - name: return_reason
+        description: "Reason for return (not Unknown)"
+        tests:
+          - not_null
+      - name: return_date
+        description: "Parsed return date"
+        tests:
+          - not_null

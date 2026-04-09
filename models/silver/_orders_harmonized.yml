@@ -1,0 +1,7 @@
+version: 2
+
+models:
+  - name: _orders_harmonized
+    description: "Ephemeral: harmonizes order data with ship mode mapping, status normalization, multi-format date parsing."
+    config:
+      materialized: ephemeral

@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: clean_customers
+    description: "Silver customers — passed all 4 quality rules (customer_id, customer_name, segment, region)."
+    columns:
+      - name: customer_id
+        description: "Unified customer identifier after COALESCE"
+        tests:
+          - not_null
+      - name: customer_name
+        description: "Customer full name"
+        tests:
+          - not_null
+      - name: segment
+        description: "Customer segment: Consumer, Corporate, Home Office"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Consumer', 'Corporate', 'Home Office']
+      - name: region
+        description: "Geographic region"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['East', 'West', 'South', 'Central', 'North']

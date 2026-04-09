@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: dim_vendors
+    description: "Vendor reference dimension."
+    columns:
+      - name: vendor_sk
+        description: "Surrogate key"
+        tests:
+          - unique
+          - not_null
+      - name: vendor_id
+        description: "Business key"
+        tests:
+          - unique
+          - not_null

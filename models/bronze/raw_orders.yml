@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: raw_orders
+    description: "Bronze extraction of order data from VARIANT. 3 CSV files across regions 1, 3, 5."
+    columns:
+      - name: order_id
+        description: "Order identifier"
+      - name: customer_id
+        description: "Customer FK"
+      - name: order_purchase_date
+        description: "Raw date string (multiple formats across regions)"

@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: dq_audit_report
+    description: "UC1: Data Quality Reporter. Groups rejected records, computes rejection rates, generates AI explanation per group via CORTEX.COMPLETE."
+    columns:
+      - name: entity
+        description: "Entity name (customers, orders, etc.)"
+      - name: affected_field
+        description: "Field with quality issue"
+      - name: ai_explanation
+        description: "LLM-generated business-friendly explanation"

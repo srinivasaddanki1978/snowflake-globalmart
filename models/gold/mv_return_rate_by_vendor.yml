@@ -1,0 +1,5 @@
+version: 2
+
+models:
+  - name: mv_return_rate_by_vendor
+    description: "Gold MV: return rate per vendor. Rubric-required name."

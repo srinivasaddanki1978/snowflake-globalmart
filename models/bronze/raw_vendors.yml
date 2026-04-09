@@ -1,0 +1,10 @@
+version: 2
+
+models:
+  - name: raw_vendors
+    description: "Bronze extraction of vendor reference from VARIANT CSV."
+    columns:
+      - name: vendor_id
+        description: "Vendor identifier"
+      - name: vendor_name
+        description: "Vendor company name"

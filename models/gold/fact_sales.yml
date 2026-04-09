@@ -1,0 +1,17 @@
+version: 2
+
+models:
+  - name: fact_sales
+    description: "Fact table at order line item grain. Orders INNER JOIN Transactions."
+    config:
+      materialized: incremental
+      incremental_strategy: append
+    columns:
+      - name: order_id
+        description: "Order identifier"
+        tests:
+          - not_null
+      - name: customer_sk
+        description: "FK to dim_customers"
+      - name: product_sk
+        description: "FK to dim_products"

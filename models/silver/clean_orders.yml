@@ -1,0 +1,30 @@
+version: 2
+
+models:
+  - name: clean_orders
+    description: "Silver orders — passed all 5 quality rules."
+    columns:
+      - name: order_id
+        description: "Order identifier"
+        tests:
+          - not_null
+      - name: customer_id
+        description: "Customer FK"
+        tests:
+          - not_null
+      - name: ship_mode
+        description: "Shipping method"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['First Class', 'Second Class', 'Standard Class', 'Same Day']
+      - name: order_status
+        description: "Order status (lowercase)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['canceled', 'created', 'delivered', 'invoiced', 'processing', 'shipped', 'unavailable']
+      - name: order_purchase_date
+        description: "Parsed purchase timestamp"
+        tests:
+          - not_null

@@ -1,0 +1,16 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: "374 unique customers after ROW_NUMBER dedup from 748 raw records. Surrogate key via dbt_utils."
+    columns:
+      - name: customer_sk
+        description: "Surrogate key"
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        description: "Business key"
+        tests:
+          - unique
+          - not_null

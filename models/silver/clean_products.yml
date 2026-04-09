@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: clean_products
+    description: "Silver products — passed 2 quality rules."
+    columns:
+      - name: product_id
+        description: "Product identifier"
+        tests:
+          - not_null
+      - name: product_name
+        description: "Product display name"
+        tests:
+          - not_null

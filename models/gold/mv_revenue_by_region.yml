@@ -1,0 +1,5 @@
+version: 2
+
+models:
+  - name: mv_revenue_by_region
+    description: "Gold MV: revenue aggregated by year x month x region. Rubric-required name."

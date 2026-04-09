@@ -1,0 +1,13 @@
+version: 2
+
+models:
+  - name: fact_returns
+    description: "Fact table at return event grain. Returns LEFT JOIN Orders."
+    config:
+      materialized: incremental
+      incremental_strategy: append
+    columns:
+      - name: order_id
+        description: "Order identifier"
+        tests:
+          - not_null

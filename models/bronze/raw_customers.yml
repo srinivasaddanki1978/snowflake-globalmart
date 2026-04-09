@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: raw_customers
+    description: "Bronze extraction of customer data from VARIANT. 4 ID column variants, 2 name variants, 2 email variants, 2 segment variants."
+    columns:
+      - name: customer_id
+        description: "Region 1, 4, 5 ID column"
+      - name: customerid
+        description: "Region 2 ID column (CustomerID)"
+      - name: cust_id
+        description: "Region 3 ID column"
+      - name: customer_identifier
+        description: "Region 6 ID column"

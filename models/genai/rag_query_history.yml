@@ -1,0 +1,12 @@
+version: 2
+
+models:
+  - name: rag_query_history
+    description: "UC3: Product Intelligence RAG. Snowpark Python model that builds RAG docs, queries Cortex Search, answers 5 test questions."
+    columns:
+      - name: question
+        description: "Test question"
+      - name: answer
+        description: "LLM answer grounded in retrieved documents"
+      - name: retrieved_count
+        description: "Number of docs retrieved"
