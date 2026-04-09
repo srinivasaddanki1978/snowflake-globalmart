@@ -3,13 +3,12 @@ globalmart:
   outputs:
     dev:
       type: snowflake
-      account: "{{ env_var('SNOWFLAKE_ACCOUNT', 'chc70950.us-east-1') }}"
-      user: "{{ env_var('SNOWFLAKE_USER') }}"
-      authenticator: snowflake_jwt
-      private_key_path: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PATH', '') }}"
-      token: "{{ env_var('SNOWFLAKE_TOKEN', '') }}"
+      account: chc70950.us-east-1
+      user: SRINIVAS
       role: ACCOUNTADMIN
       database: GLOBALMART
       warehouse: COMPUTE_WH
       schema: PUBLIC
       threads: 4
+      authenticator: programmatic_access_token
+      token: "{{ env_var('SNOWFLAKE_TOKEN', '') }}"
