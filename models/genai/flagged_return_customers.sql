@@ -70,8 +70,7 @@ SELECT
         || 'Approval rate: ' || approval_rate_pct::VARCHAR || '%. '
         || 'Reasons: ' || COALESCE(return_reasons, 'N/A') || '. '
         || 'Score: ' || anomaly_score::VARCHAR || '/100. '
-        || 'Rules: ' || rules_violated,
-        {'temperature': 0.3, 'max_tokens': 512}
+        || 'Rules: ' || rules_violated
     ) AS investigation_brief,
     CURRENT_TIMESTAMP() AS generated_at
 FROM flagged

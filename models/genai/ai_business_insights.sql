@@ -67,8 +67,7 @@ SELECT
         'You are an executive analyst for GlobalMart. Write a 4-6 sentence executive summary. '
         || 'Cite specific dollar amounts and percentages. Identify strongest and weakest areas. '
         || 'Include one actionable recommendation. '
-        || 'Domain: ' || insight_type || '. KPIs: ' || kpi_data,
-        {'temperature': 0.3, 'max_tokens': 512}
+        || 'Domain: ' || insight_type || '. KPIs: ' || kpi_data
     ) AS executive_summary,
     kpi_data,
     CURRENT_TIMESTAMP() AS generated_at

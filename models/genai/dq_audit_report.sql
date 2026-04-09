@@ -51,8 +51,7 @@ SELECT
         || '. Rejected: ' || rejected_count::VARCHAR
         || ' out of ' || COALESCE(total_entity_records::VARCHAR, 'unknown')
         || ' records (' || COALESCE(rejection_rate_pct::VARCHAR, 'N/A') || '%). '
-        || 'Samples: ' || COALESCE(sample_records, 'none'),
-        {'temperature': 0.3, 'max_tokens': 512}
+        || 'Samples: ' || COALESCE(sample_records, 'none')
     ) AS ai_explanation,
     CURRENT_TIMESTAMP() AS generated_at
 FROM enriched

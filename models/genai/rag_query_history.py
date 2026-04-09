@@ -77,9 +77,19 @@ def model(dbt, session: snowpark.Session):
     # ── Step 2: Insert into RAG_DOCUMENTS ──
     session.sql("DELETE FROM GLOBALMART.GOLD.RAG_DOCUMENTS").collect()
 
-    product_docs.write.mode("append").save_as_table("GLOBALMART.GOLD.RAG_DOCUMENTS")
-    product_region_docs.write.mode("append").save_as_table("GLOBALMART.GOLD.RAG_DOCUMENTS")
-    vendor_docs.write.mode("append").save_as_table("GLOBALMART.GOLD.RAG_DOCUMENTS")
+    # Insert using INSERT INTO ... SELECT to match exact table schema
+    product_docs.write.mode("append").save_as_table(
+        "GLOBALMART.GOLD.RAG_DOCUMENTS",
+        column_order="name"
+    )
+    product_region_docs.write.mode("append").save_as_table(
+        "GLOBALMART.GOLD.RAG_DOCUMENTS",
+        column_order="name"
+    )
+    vendor_docs.write.mode("append").save_as_table(
+        "GLOBALMART.GOLD.RAG_DOCUMENTS",
+        column_order="name"
+    )
 
     # ── Step 3: Query Cortex Search Service with 5 test questions ──
     test_questions = [
@@ -111,15 +121,13 @@ def model(dbt, session: snowpark.Session):
                 retrieved_count = 0
 
             # Call CORTEX.COMPLETE with retrieved context
-            cortex_opts = "{'temperature': 0.3, 'max_tokens': 512}"
             answer_result = session.sql(f"""
                 SELECT SNOWFLAKE.CORTEX.COMPLETE(
                     'llama3.1-70b',
                     'Answer ONLY from the retrieved documents below. '
                     || 'If the information is not in the documents, say so. '
                     || 'Question: {question.replace("'", "''")} '
-                    || 'Documents: {retrieved_docs[:3000].replace("'", "''")}',
-                    {cortex_opts}
+                    || 'Documents: {retrieved_docs[:3000].replace("'", "''")}'
                 ) AS answer
             """).collect()
 
