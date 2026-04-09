@@ -1,26 +1,27 @@
 {#
     Override dbt's default generate_schema_name behavior.
 
-    Default behavior concatenates target schema with custom schema:
+    DEFAULT dbt behavior concatenates target schema with custom schema:
         target.schema=PUBLIC + custom_schema=GOLD  →  PUBLIC_GOLD
 
-    We want the custom schema to be used as-is (GOLD, BRONZE, SILVER, etc.)
-    to match the CLAUDE.md spec and the manually-created Snowflake schemas.
+    THIS OVERRIDE uses the custom schema as-is:
+        custom_schema=GOLD  →  GOLD
 
     Models with no custom schema fall back to target.schema (PUBLIC).
+
+    Includes a log() call so you can verify the macro is being invoked
+    by running: dbt compile --select bridge_return_products
+    The log lines appear in stdout/dbt.log during compilation.
 #}
 
 {% macro generate_schema_name(custom_schema_name, node) -%}
 
-    {%- set default_schema = target.schema -%}
     {%- if custom_schema_name is none -%}
-
-        {{ default_schema }}
-
+        {{ log("[generate_schema_name] custom=None -> using target.schema=" ~ target.schema, info=True) }}
+        {{ target.schema }}
     {%- else -%}
-
+        {{ log("[generate_schema_name] custom=" ~ custom_schema_name ~ " -> returning as-is", info=True) }}
         {{ custom_schema_name | trim }}
-
     {%- endif -%}
 
 {%- endmacro %}
