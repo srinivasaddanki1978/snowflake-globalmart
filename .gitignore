@@ -16,6 +16,7 @@ __pycache__/
 target/
 dbt_packages/
 logs/
+package-lock.yml
 
 # IDE
 .vscode/
@@ -24,3 +25,4 @@ logs/
 # OS
 .DS_Store
 Thumbs.db
+dbt_internal_packages/

@@ -17,10 +17,12 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: ['Consumer', 'Corporate', 'Home Office']
+              arguments:
+                values: ['Consumer', 'Corporate', 'Home Office']
       - name: region
         description: "Geographic region"
         tests:
           - not_null
           - accepted_values:
-              values: ['East', 'West', 'South', 'Central', 'North']
+              arguments:
+                values: ['East', 'West', 'South', 'Central', 'North']

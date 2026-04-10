@@ -183,7 +183,7 @@ def upload_files(cur):
             print(f"  {local_rel} -> {stage_path or '(root)'} [{status}]")
             success += 1
         except Exception as e:
-            print(f"  FAILED: {local_rel} — {str(e)[:80]}")
+            print(f"  FAILED: {local_rel} - {str(e)[:80]}")
 
     print(f"  {success}/16 files uploaded.")
 
@@ -199,7 +199,7 @@ def seed_data(cur):
     print("\n  Resuming scheduled tasks...")
     cur.execute("ALTER TASK GLOBALMART.RAW.TRANSFORM_ON_NEW_DATA RESUME")
     cur.execute("ALTER TASK GLOBALMART.RAW.INGEST_NEW_FILES RESUME")
-    print("  Tasks resumed (INGEST every 5 min → TRANSFORM on new data).")
+    print("  Tasks resumed (INGEST every 5 min -> TRANSFORM on new data).")
 
 
 def verify_counts(cur):
@@ -272,7 +272,7 @@ def main():
     include_genai = "--genai" in sys.argv
 
     print("=" * 55)
-    print("  GlobalMart — One-Command Deployment")
+    print("  GlobalMart - One-Command Deployment")
     print("=" * 55)
 
     token = get_token()
