@@ -9,7 +9,6 @@ Reads the token from Connect-token-secret.txt (project root) or
 the SNOWFLAKE_TOKEN environment variable.
 
 Run this from the project root directory:
-    cd C:\Srinivas\project\snowflake-globalmart
     python setup/upload_to_stage.py
 """
 
