@@ -29,3 +29,14 @@ AS (
     SELECT doc_id, doc_type, doc_text, product_id, vendor_id, region, updated_at
     FROM GLOBALMART.GOLD.RAG_DOCUMENTS
 );
+
+-- ============================================================
+-- Cortex Analyst: Semantic Model Stage
+-- Upload semantic_model.yaml via deploy.py or manually:
+--   PUT 'file://cortex_analyst/semantic_model.yaml'
+--       @GLOBALMART.GOLD.SEMANTIC_MODEL_STAGE
+--       AUTO_COMPRESS=FALSE OVERWRITE=TRUE;
+-- ============================================================
+
+CREATE STAGE IF NOT EXISTS GLOBALMART.GOLD.SEMANTIC_MODEL_STAGE
+  COMMENT = 'Stores Cortex Analyst semantic model YAML';
