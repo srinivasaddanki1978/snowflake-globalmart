@@ -17,21 +17,18 @@ models:
         tests:
           - not_null
           - in_range:
-              arguments:
-                min_value: 0
+              min_value: 0
       - name: quantity
         description: "Quantity sold"
         tests:
           - not_null
           - in_range:
-              arguments:
-                min_value: 1
-                inclusive: true
+              min_value: 1
+              inclusive: true
       - name: discount
         description: "Discount rate (0-1 range)"
         tests:
           - not_null
           - in_range:
-              arguments:
-                min_value: 0
-                max_value: 1
+              min_value: 0
+              max_value: 1

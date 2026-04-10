@@ -17,15 +17,13 @@ models:
         tests:
           - not_null
           - accepted_values:
-              arguments:
-                values: ['First Class', 'Second Class', 'Standard Class', 'Same Day']
+              values: ['First Class', 'Second Class', 'Standard Class', 'Same Day']
       - name: order_status
         description: "Order status (lowercase)"
         tests:
           - not_null
           - accepted_values:
-              arguments:
-                values: ['canceled', 'created', 'delivered', 'invoiced', 'processing', 'shipped', 'unavailable']
+              values: ['canceled', 'created', 'delivered', 'invoiced', 'processing', 'shipped', 'unavailable']
       - name: order_purchase_date
         description: "Parsed purchase timestamp"
         tests:
