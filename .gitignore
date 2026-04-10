@@ -17,6 +17,7 @@ target/
 dbt_packages/
 logs/
 package-lock.yml
+.user.yml
 
 # IDE
 .vscode/
