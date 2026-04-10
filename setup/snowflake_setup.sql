@@ -376,3 +376,31 @@ CREATE OR REPLACE TASK GLOBALMART.RAW.TRANSFORM_ON_NEW_DATA
     OR SYSTEM$STREAM_HAS_DATA('GLOBALMART.RAW.VENDORS_STREAM')
 AS
   CALL GLOBALMART.RAW.RUN_DBT_PIPELINE();
+
+-- ============================================================
+-- 9. Git Integration (for Snowflake dbt from Git)
+--
+-- Allows Snowflake to pull the dbt project directly from GitHub.
+-- For public repos: GIT_CREDENTIALS is optional.
+-- For private repos: Create a secret with your GitHub PAT first.
+-- ============================================================
+
+-- Secret for GitHub credentials (skip for public repos)
+-- To use: Replace <YOUR_GITHUB_PAT> with your personal access token
+CREATE SECRET IF NOT EXISTS GLOBALMART.RAW.GIT_SECRET
+  TYPE = PASSWORD
+  USERNAME = 'srinivasaddanki1978'
+  PASSWORD = '';
+
+-- API integration for Git HTTPS access
+CREATE OR REPLACE API INTEGRATION GLOBALMART_GIT_INTEGRATION
+  API_PROVIDER = GIT_HTTPS_API
+  API_ALLOWED_PREFIXES = ('https://github.com/srinivasaddanki1978/')
+  ALLOWED_AUTHENTICATION_SECRETS = (GLOBALMART.RAW.GIT_SECRET)
+  ENABLED = TRUE;
+
+-- Git repository connection
+CREATE OR REPLACE GIT REPOSITORY GLOBALMART.RAW.SNOWFLAKE_GLOBALMART
+  API_INTEGRATION = GLOBALMART_GIT_INTEGRATION
+  GIT_CREDENTIALS = GLOBALMART.RAW.GIT_SECRET
+  ORIGIN = 'https://github.com/srinivasaddanki1978/snowflake-globalmart.git';
